@@ -1,6 +1,7 @@
 # SRv6 SID fetching docker for IOS-XR
 
 This docker is used for fetching the SID from IOS-XR devices from Yang(through gRPC) and store it in etcd (Anothor docker on IOS XR)
+
 Will also provide API for application querying the data.
 
 #### Usage:
@@ -15,13 +16,12 @@ replace # Part with the value in your environment：
 
 For Example：
 
-
-Router Hostname : RouterA
-gRPC Port: 57777
-Username : Cisco
-Password : Cisco
-Etcd IP : 172.20.100.150
-Etcd Port :2769
+- Router Hostname : RouterA
+- gRPC Port: 57777
+- Username : Cisco
+- Password : Cisco
+- Etcd IP : 172.20.100.150
+- Etcd Port :2769
 
 Then the command is:
 
