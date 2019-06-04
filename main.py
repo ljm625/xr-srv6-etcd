@@ -20,7 +20,7 @@ class gRPCFetcher(object):
             err, result = self.client.getoper(path)
             if err:
                 pprint(err)
-            pprint(json.loads(result))
+            # pprint(json.loads(result))
             return json.loads(result)
         except AbortionError:
             print(

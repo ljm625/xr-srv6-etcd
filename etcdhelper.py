@@ -66,6 +66,6 @@ class EtcdHelper(object):
 
 
 if __name__ == '__main__':
-    etcd=EtcdHelper("172.20.100.150",2379)
+    etcd=EtcdHelper("dude.cisco.com",52379)
     etcd.put("test","newtest")
     print(etcd.get("test"))
