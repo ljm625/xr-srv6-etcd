@@ -1,0 +1,11 @@
+Value Hostname (\S+)
+Value EndSid (\S+)
+Value Locator (\S+\/[0-9]{1,3})
+
+Start
+  ^${Hostname}\.00
+  ^\s+SRv6 Locator:\s+MT \(IPv6 Unicast\)\s${Locator}\s+
+  ^\s+END\sSID:\s+${EndSid}\sEnd -> Record
+
+EOF
+
