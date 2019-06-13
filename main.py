@@ -165,7 +165,7 @@ def main():
             for k,v in sid_data.items():
                 etcd.put(k,json.dumps(v))
             node_list=[]
-            for k,v in ip_data:
+            for k,v in ip_data.items():
                 node_list.append(k)
             etcd.put('nodes',json.dumps(node_list))
             etcd.put('node_ip',json.dumps(ip_data))
