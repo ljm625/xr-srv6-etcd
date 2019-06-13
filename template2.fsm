@@ -1,0 +1,9 @@
+Value Hostname (\S+)
+Value IPAddress ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})
+
+Start
+  ^${Hostname}\.00
+  ^\s+IP\sAddress:\s+${IPAddress} -> Record
+
+EOF
+

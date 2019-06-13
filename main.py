@@ -4,6 +4,8 @@ from pprint import pprint
 import sys
 
 import time
+
+import textfsm
 from grpc.framework.interfaces.face.face import AbortionError
 import json
 from iosxr_grpc.cisco_grpc_client import CiscoGRPCClient
@@ -40,19 +42,38 @@ class gRPCFetcher(object):
 
 
 class SIDProcessor(object):
-    def __init__(self):
+    def __init__(self,template="template.fsm"):
+        self.template=template
         pass
 
-    def get_sids(self,data):
-        sid_data=[]
-        pprint(data["Cisco-IOS-XR-segment-routing-srv6-oper:srv6"]["active"]["locator-all-active-sids"]["locator-all-active-sid"])
-        for sid in data["Cisco-IOS-XR-segment-routing-srv6-oper:srv6"]["active"]["locator-all-active-sids"]["locator-all-active-sid"]:
-            print("{} - {}".format(sid["function-type"],sid["sid"]))
-            tmp_data={"name":sid["function-type"],"sid":sid["sid"],"sid-context":sid["sid-context"]}
-            if sid["function-type"] == "end-x-with-psp":
-                tmp_data["interface"] = sid["sid-context"]["key"]["x"]["interface"]
-            sid_data.append(tmp_data)
+    def get_sids(self,raw_data):
+        sid_data={}
+        with open(self.template) as file:
+            re_table = textfsm.TextFSM(file)
+            data = re_table.ParseText(raw_data)
+
+            # Display result as CSV
+            # First the column headers
+            # print(', '.join(re_table.header))
+            # Each row of the table.
+            for row in data:
+                sid_data[row[0]]=[{
+                    "name":"end-with-psp",
+                    "sid":row[1]
+                }]
+                print(', '.join(row))
+
         return sid_data
+
+    def get_ip(self,raw_data):
+        ip_data={}
+        with open("template2.fsm") as file:
+            re_table = textfsm.TextFSM(file)
+            data = re_table.ParseText(raw_data)
+            for row in data:
+                ip_data[row[0]] = row[1]
+                print(', '.join(row))
+        return ip_data
 
     # def replace(self):
     #     path = open('snips/bgp_start.json').read()
@@ -100,15 +121,15 @@ def main():
     Here is a workflow of the example that uses all the different types.
     '''
     grpc_port = username = password = etcd_ip = etcd_port= device_name= None
-    opts, args = getopt.getopt(sys.argv[1:], '-h-d:-g:-u:-p:-i:-e:', ['help','device-name=', 'grpc-port=', 'username=', 'password=', 'etcd-ip=', 'etcd-port='])
+    opts, args = getopt.getopt(sys.argv[1:], '-h:-g:-u:-p:-i:-e:', ['help', 'grpc-port=', 'username=', 'password=', 'etcd-ip=', 'etcd-port='])
     for opt_name, opt_value in opts:
         if opt_name in ('-h', '--help'):
             print(
                 "[*] Help: Please enter Hostname, gRPC port, username, password, Etcd IP, Etcd Port in parameters. Example: \n python main.py -d RouterA -g 57777 -u cisco -p cisco -i 127.0.0.1 -e 2379")
             exit()
-        if opt_name in ('-d', '--device-name'):
-            device_name= opt_value
-            print("[*] Device name is {}".format(device_name))
+        # if opt_name in ('-d', '--device-name'):
+        #     device_name= opt_value
+        #     print("[*] Device name is {}".format(device_name))
         if opt_name in ('-g', '--grpc-port'):
             grpc_port= int(opt_value)
             print("[*] gRPC port is {}".format(grpc_port))
@@ -131,16 +152,26 @@ def main():
         exit()
     # device_name="RouterA"
 
-    grpc = gRPCFetcher('jp.debug.tech', grpc_port, username, password)
+    grpc = gRPCFetcher('127.0.0.1', grpc_port, username, password)
     old_sid_data=None
+    old_ip_data = None
     while True:
-        data = grpc.get()
+        data = grpc.exec("show isis database verbose")
         processor = SIDProcessor()
         sid_data= processor.get_sids(data)
-        if sid_data!=old_sid_data:
+        ip_data = processor.get_ip(data)
+        if sid_data!=old_sid_data or ip_data!=old_ip_data:
             etcd=EtcdHelper(etcd_ip,etcd_port)
-            etcd.put(device_name,json.dumps(sid_data))
+            for k,v in sid_data.items():
+                etcd.put(k,json.dumps(v))
+            node_list=[]
+            for k,v in ip_data:
+                node_list.append(k)
+            etcd.put('nodes',json.dumps(node_list))
+            etcd.put('node_ip',json.dumps(ip_data))
             print("[*] Updating SID Info")
+            old_ip_data=ip_data
+            old_sid_data=sid_data
         time.sleep(60)
     # pprint(sid_data)
 if __name__ == '__main__':

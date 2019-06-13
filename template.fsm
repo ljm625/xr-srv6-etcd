@@ -1,6 +1,7 @@
 Value Hostname (\S+)
 Value EndSid (\S+)
 Value Locator (\S+\/[0-9]{1,3})
+Value IPAddress ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})
 
 Start
   ^${Hostname}\.00
