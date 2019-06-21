@@ -47,21 +47,38 @@ class SIDProcessor(object):
         pass
 
     def get_sids(self,raw_data):
+        # print(raw_data)
         sid_data={}
         with open(self.template) as file:
             re_table = textfsm.TextFSM(file)
             data = re_table.ParseText(raw_data)
-
+            new_data=[]
+            tmp_entry=[]
+            for row in data:
+                if tmp_entry:
+                    if tmp_entry[0] == row[0] and tmp_entry[1] == row[1]:
+                        tmp_entry[2].extend(row[2])
+                    else:
+                        new_data.append(tmp_entry)
+                        tmp_entry=row
+                else:
+                    tmp_entry=row
+            new_data.append(tmp_entry)
             # Display result as CSV
             # First the column headers
             # print(', '.join(re_table.header))
             # Each row of the table.
-            for row in data:
+            for row in new_data:
                 sid_data[row[0]]=[{
                     "name":"end-with-psp",
                     "sid":row[1]
                 }]
-                print(', '.join(row))
+                for data in row[2]:
+                    sid_data[row[0]].append({
+                        "name":"end-x-with-psp",
+                        "sid":data
+                    })
+                print('{}, {}, {}, {} '.format(row[0],row[1],json.dumps(row[2]),row[3]))
 
         return sid_data
 
@@ -120,8 +137,8 @@ def main():
     This example does not use TLS, if you want to use TLS please refer to the example with tls
     Here is a workflow of the example that uses all the different types.
     '''
-    grpc_port = username = password = etcd_ip = etcd_port= device_name= None
-    opts, args = getopt.getopt(sys.argv[1:], '-h:-g:-u:-p:-i:-e:', ['help', 'grpc-port=', 'username=', 'password=', 'etcd-ip=', 'etcd-port='])
+    grpc_port = username = password = etcd_ip = etcd_port= device_name= grpc_ip=  None
+    opts, args = getopt.getopt(sys.argv[1:], '-h:-g:-u:-p:-i:-e:-z:', ['help', 'grpc-port=', 'username=', 'password=', 'etcd-ip=', 'etcd-port=', 'grpc-ip='])
     for opt_name, opt_value in opts:
         if opt_name in ('-h', '--help'):
             print(
@@ -146,13 +163,17 @@ def main():
         if opt_name in ('-e', '--etcd-port'):
             etcd_port = int(opt_value)
             print("[*] Etcd Port is {}".format(etcd_port))
-    if None in [grpc_port, username, password, etcd_ip, etcd_port]:
+        if opt_name in ('-z', '--grpc-ip'):
+            grpc_ip = opt_value
+            print("[*] Etcd IP is {}".format(etcd_ip))
+
+    if None in [grpc_ip, grpc_port, username, password, etcd_ip, etcd_port]:
         print(
             "[*] Help: Please enter Hostname, gRPC port, username, password, Etcd IP, Etcd Port in parameters. Example: \n python main.py -d RouterA -gp 57777 -u cisco -p cisco -e 127.0.0.1 -ep 2379")
         exit()
     # device_name="RouterA"
 
-    grpc = gRPCFetcher('127.0.0.1', grpc_port, username, password)
+    grpc = gRPCFetcher(grpc_ip, grpc_port, username, password)
     old_sid_data=None
     old_ip_data = None
     while True:
