@@ -142,7 +142,7 @@ def main():
     for opt_name, opt_value in opts:
         if opt_name in ('-h', '--help'):
             print(
-                "[*] Help: Please enter Hostname, gRPC port, username, password, Etcd IP, Etcd Port in parameters. Example: \n python main.py -d RouterA -g 57777 -u cisco -p cisco -i 127.0.0.1 -e 2379")
+                "[*] Help: Please enter Hostname, gRPC port, username, password, Etcd IP, Etcd Port in parameters. Example: \n python main.py -d RouterA -g 57777 -u cisco -p cisco -i 127.0.0.1 -e 2379 -z 127.0.0.1")
             exit()
         # if opt_name in ('-d', '--device-name'):
         #     device_name= opt_value
@@ -169,7 +169,7 @@ def main():
 
     if None in [grpc_ip, grpc_port, username, password, etcd_ip, etcd_port]:
         print(
-            "[*] Help: Please enter Hostname, gRPC port, username, password, Etcd IP, Etcd Port in parameters. Example: \n python main.py -d RouterA -gp 57777 -u cisco -p cisco -e 127.0.0.1 -ep 2379")
+            "[*] Help: Please enter Hostname, gRPC port, username, password, Etcd IP, Etcd Port, gRPC IP in parameters. Example: \n python main.py -d RouterA -g 57777 -u cisco -p cisco -i 127.0.0.1 -e 2379 -z 127.0.0.1")
         exit()
     # device_name="RouterA"
 
