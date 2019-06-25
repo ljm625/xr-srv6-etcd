@@ -6,7 +6,7 @@ This docker is used for fetching the SID from IOS-XR devices from CLI Command(th
 
 On IOS XR Bash, exec
 ```bash
-docker pull ljm625/xr-srv6-etcd
+docker pull ljm625/xr-srv6-etcd:cli
 docker run -itd   --cap-add=SYS_ADMIN   --cap-add=NET_ADMIN   -v /var/run/netns:/var/run/netns ljm625/xr-srv6-etcd -d #RouterName -g #gRPCPort -u #UserName -p #Password -i #EtcdIP -e #EtcdPort -z #gRPCIP
 ```
 
@@ -14,7 +14,6 @@ replace # Part with the value in your environment：
 
 For Example：
 
-- Router Hostname : RouterA
 - gRPC IP : 127.0.0.1
 - gRPC Port: 57777
 - Username : Cisco
@@ -27,8 +26,8 @@ Then the command is:
 
 ```
 docker run -itd   --cap-add=SYS_ADMIN   --cap-add=NET_ADMIN \
-  -v /var/run/netns:/var/run/netns ljm625/xr-srv6-etcd \
-   -d RouterA -g 57777 -u Cisco -p Cisco -i 172.20.100.150 -e 2769
+  -v /var/run/netns:/var/run/netns ljm625/xr-srv6-etcd:cli \
+   -g 57777 -u Cisco -p Cisco -i 172.20.100.150 -e 2769 -z 127.0.0.1
 ```
 
 
