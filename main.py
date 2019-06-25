@@ -143,7 +143,7 @@ def main():
         exit()
     # device_name="RouterA"
 
-    grpc = gRPCFetcher('jp.debug.tech', grpc_port, username, password)
+    grpc = gRPCFetcher(grpc_ip, grpc_port, username, password)
     old_sid_data = old_hostname = old_lb_address=None
     while True:
         data = grpc.get()
