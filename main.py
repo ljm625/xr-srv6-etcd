@@ -162,6 +162,8 @@ def main():
                 if hostname not in node_list:
                     node_list.append(hostname)
                     etcd.put('nodes', json.dumps(node_list))
+            else:
+                etcd.put('nodes', json.dumps([hostname]))
             # Node IP List
             result =etcd.get('node_ip')
             if result:
@@ -169,6 +171,9 @@ def main():
                 if hostname not in ip_data.keys():
                     ip_data[hostname]=lb_address
                     etcd.put('node_ip', json.dumps(ip_data))
+            else:
+                etcd.put('node_ip', json.dumps({hostname:ip_data}))
+
             print("[*] Updating SID Info")
             old_sid_data=sid_data
             old_hostname=hostname
