@@ -1,13 +1,13 @@
 # SRv6 SID fetching docker for IOS-XR
 
-This docker is used for fetching the SID from IOS-XR devices from CLI Command(through gRPC) and store it in etcd (Anothor docker on IOS XR)
+This docker is used for fetching the SIDs across the network from IOS-XR devices from CLI show comand(through gRPC and ISIS database) and store it in etcd (Anothor docker on IOS XR)
 
 #### Usage:
 
 On IOS XR Bash, exec
 ```bash
 docker pull ljm625/xr-srv6-etcd:cli
-docker run -itd   --cap-add=SYS_ADMIN   --cap-add=NET_ADMIN   -v /var/run/netns:/var/run/netns ljm625/xr-srv6-etcd -d #RouterName -g #gRPCPort -u #UserName -p #Password -i #EtcdIP -e #EtcdPort -z #gRPCIP
+docker run -itd   --cap-add=SYS_ADMIN   --cap-add=NET_ADMIN   -v /var/run/netns:/var/run/netns ljm625/xr-srv6-etcd:cli -d #RouterName -g #gRPCPort -u #UserName -p #Password -i #EtcdIP -e #EtcdPort -z #gRPCIP
 ```
 
 replace # Part with the value in your environment：
